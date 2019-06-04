@@ -5,7 +5,7 @@ import * as Typescript from '../../src/typescript'
 import { Database } from '../../src/schema'
 import Options, { OptionValues } from '../../src/options'
 
-const options: OptionValues = {}
+const options: Partial<OptionValues> = {}
 
 describe('index', () => {
     const typedTableSandbox = sinon.sandbox.create()
