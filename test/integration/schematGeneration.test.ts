@@ -19,7 +19,7 @@ describe('schemat generation integration testing', () => {
             const inputSQLFile = 'test/fixture/postgres/osm.sql'
             const outputFile = './test/actual/postgres/osm.ts'
             const expectedFile = './test/expected/postgres/osm.ts'
-            const config: any = './fixture/postgres/osm.json'
+            const config: any = '../../test/fixture/postgres/osm.json'
             await writeTsFile(inputSQLFile, config, outputFile, db)
             return assert(await compare(expectedFile, outputFile))
         })
@@ -27,7 +27,7 @@ describe('schemat generation integration testing', () => {
             const inputSQLFile = 'test/fixture/postgres/osm.sql'
             const outputFile = './test/actual/postgres/osm-camelcase.ts'
             const expectedFile = './test/expected/postgres/osm-camelcase.ts'
-            const config: any = './fixture/postgres/osm-camelcase.json'
+            const config: any = '../../test/fixture/postgres/osm-camelcase.json'
             await writeTsFile(inputSQLFile, config, outputFile, db)
             return assert(await compare(expectedFile, outputFile))
         })
@@ -46,14 +46,14 @@ describe('schemat generation integration testing', () => {
             const inputSQLFile = 'test/fixture/mysql/osm.sql'
             const outputFile = './test/actual/mysql/osm.ts'
             const expectedFile = './test/expected/mysql/osm.ts'
-            const config: any = './fixture/mysql/osm.json'
+            const config: any = '../../test/fixture/mysql/osm.json'
             await writeTsFile(inputSQLFile, config, outputFile, db)
             return assert(await compare(expectedFile, outputFile))
         })
         it('Enum conflict in columns', async () => {
             const inputSQLFile = 'test/fixture/mysql/conflict.sql'
             const outputFile = './test/actual/mysql/conflict.ts'
-            const config: any = './fixture/mysql/conflict.json'
+            const config: any = '../../test/fixture/mysql/conflict.json'
             try {
                 await writeTsFile(inputSQLFile, config, outputFile, db)
             } catch (e) {
