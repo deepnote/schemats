@@ -2,6 +2,8 @@ import * as assert from 'power-assert'
 import { Database, getDatabase } from '../../src/index'
 import { writeTsFile, compare, loadSchema } from '../testUtility'
 
+require('dotenv').config()
+
 describe('schemat generation integration testing', () => {
     describe('postgres', () => {
         let db: Database

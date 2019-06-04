@@ -52,6 +52,7 @@
     "coveralls": "^2.11.15",
     "del-cli": "^0.2.0",
     "dependency-check": "^2.6.0",
+    "dotenv": "^8.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "nyc": "^11.0.2",
