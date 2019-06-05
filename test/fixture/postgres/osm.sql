@@ -79,3 +79,17 @@ CREATE TABLE users (
     jsonb_array_col jsonb[],
     timestamptz_array_col timestamptz[]
 );
+
+DROP TABLE IF EXISTS lookup_single_primary;
+CREATE TABLE lookup_single_primary (
+	-- NOW table fixture
+);
+
+DROP TABLE IF EXISTS lookup_multiple_primary;
+CREATE TABLE lookup_multiple_primary (
+	-- NOW table fixture
+);
+
+DROP TABLE IF EXISTS lookup_no_primary (
+	-- NOW table fixture
+);

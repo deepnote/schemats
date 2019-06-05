@@ -131,3 +131,5 @@ export interface users {
     jsonb_array_col: usersFields.jsonb_array_col;
     timestamptz_array_col: usersFields.timestamptz_array_col;
 }
+
+// NOW add lookup enum/map expectations

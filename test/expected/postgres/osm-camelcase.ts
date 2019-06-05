@@ -132,3 +132,5 @@ export interface Users {
     timestamptzArrayCol: UsersFields.timestamptzArrayCol;
 
 }
+
+// NOW add lookup enum/map expectations
