@@ -128,17 +128,19 @@ export class MysqlDatabase implements Database {
         let tableDefinition: TableDefinition = {}
 
         const tableColumns = await this.queryAsync(
-            'SELECT column_name, data_type, is_nullable ' +
-            'FROM information_schema.columns ' +
-            'WHERE table_name = ? and table_schema = ?',
+            `SELECT column_name, data_type, is_nullable, column_key = 'PRI' as is_primary
+            FROM information_schema.columns
+            WHERE table_name = ? and table_schema = ?`,
             [tableName, tableSchema]
         )
-        tableColumns.map((schemaItem: { column_name: string, data_type: string, is_nullable: string }) => {
+        tableColumns.map((schemaItem: { column_name: string, data_type: string, is_nullable: string, is_primary: number }) => {
             const columnName = schemaItem.column_name
             const dataType = schemaItem.data_type
+            
             tableDefinition[columnName] = {
                 udtName: /^(enum|set)$/i.test(dataType) ? MysqlDatabase.getEnumNameFromColumn(dataType, columnName) : dataType,
-                nullable: schemaItem.is_nullable === 'YES'
+                nullable: schemaItem.is_nullable === 'YES',
+                primary: schemaItem.is_primary === 1
             }
         })
         return tableDefinition

@@ -119,16 +119,31 @@ export class PostgresDatabase implements Database {
 
     public async getTableDefinition (tableName: string, tableSchema: string) {
         let tableDefinition: TableDefinition = {}
-        type T = { column_name: string, udt_name: string, is_nullable: string }
-        await this.db.each<T>(
-            'SELECT column_name, udt_name, is_nullable ' +
-            'FROM information_schema.columns ' +
-            'WHERE table_name = $1 and table_schema = $2',
+        type T = { column_name: string, udt_name: string, is_nullable: string, is_primary: boolean };
+        await this.db.each<T>( // FIXME https://stackoverflow.com/questions/1214576/how-do-i-get-the-primary-keys-of-a-table-from-postgres-via-plpgsql
+            `SELECT
+                column_name, udt_name, is_nullable,
+                column_name IN (
+                    SELECT cols.column_name
+                    FROM information_schema.constraint_column_usage cols
+                    LEFT JOIN
+                        information_schema.table_constraints constraints
+                        ON cols.constraint_name = constraints.constraint_name
+                    WHERE cols.table_schema = $2 AND cols.table_name = $1 AND constraints.constraint_type = 'PRIMARY KEY'
+                ) AS is_primary
+            FROM
+                information_schema.columns
+            WHERE
+                table_name = $1
+                AND
+                table_schema = $2
+            `,
             [tableName, tableSchema],
             (schemaItem: T) => {
                 tableDefinition[schemaItem.column_name] = {
                     udtName: schemaItem.udt_name,
-                    nullable: schemaItem.is_nullable === 'YES'
+                    nullable: schemaItem.is_nullable === 'YES',
+                    primary: schemaItem.is_primary
                 }
             })
         return tableDefinition
