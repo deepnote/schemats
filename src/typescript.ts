@@ -5,7 +5,7 @@
 
 import * as _ from 'lodash'
 
-import { TableDefinition } from './schemaInterfaces'
+import { TableDefinition, Database } from './schemaInterfaces'
 import Options from './options'
 
 function nameIsReservedKeyword (name: string): boolean {
@@ -39,7 +39,7 @@ export function generateTableInterface (tableNameRaw: string, tableDefinition: T
     `
 }
 
-export function generateEnumType (enumObject: any, options: Options) {
+export function generateEnumType (enumObject: any, options: Options) { // XXX generate real enum declaration?
     let enumString = ''
     for (let enumNameRaw in enumObject) {
         const enumName = options.transformTypeName(enumNameRaw)
@@ -63,6 +63,39 @@ export function generateTableTypes (tableNameRaw: string, tableDefinition: Table
     return `
         export namespace ${tableName}Fields {
         ${fields}
+        }
+    `
+}
+
+export async function generateLookupEnum (db: Database, tableNameRaw: string, tableDefinition: TableDefinition, options: Options): Promise<string> {
+    const tableName = options.transformTypeName(tableNameRaw)
+    const primary = Object.keys(tableDefinition).find(col => tableDefinition[col].primary)
+    if (!primary) {
+        throw new TypeError('No primary column for lookup table')
+    }
+    
+    let entries = ''
+    
+    const tableContent = await db.query(`SELECT * FROM ${tableNameRaw}`)
+    
+    tableContent.forEach(row => {
+        let values = ''
+        
+        /* Object.keys(tableDefinition).forEach(columnNameRaw => { TODO this can be done prettier
+            let type = tableDefinition[columnNameRaw].tsType
+            const columnName = options.transformColumnName(columnNameRaw)
+            
+            values += `${JSON.stringify(row)}`
+        }) */
+        
+        values = JSON.stringify(row)
+        
+        entries += `${(row as any)[primary]}: ${values} as ${tableName},\n`
+    })
+    
+    return `
+        export const ${tableName}Values = {
+        ${entries}
         }
     `
 }
