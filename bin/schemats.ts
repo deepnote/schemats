@@ -8,14 +8,16 @@ import * as yargs from 'yargs'
 import * as fs from 'fs'
 import { typescriptOfSchema, getDatabase } from '../src/index'
 import Options from '../src/options'
+import { createExpressionWithTypeArguments } from 'typescript';
 
 interface SchematsConfig {
     conn: string,
     table: string[] | string,
     schema: string,
     output: string,
-    camelCase: boolean,
+    camelCase: boolean | 'columns' | 'types',
     noHeader: boolean,
+    lookupTable: string[] | string;
 }
 
 let argv: SchematsConfig = yargs
@@ -28,23 +30,34 @@ let argv: SchematsConfig = yargs
     .demand(1)
     // tslint:disable-next-line
     .example('$0 generate -c postgres://username:password@localhost/db -t table1 -t table2 -s schema -o interface_output.ts', 'generate typescript interfaces from schema')
+    
     .demand('c')
     .alias('c', 'conn')
     .nargs('c', 1)
     .describe('c', 'database connection string')
+    
     .alias('t', 'table')
     .nargs('t', 1)
     .describe('t', 'table name')
+    
+    .alias('l', 'lookupTable')
+    .nargs('l', 1)
+    .describe('l', 'lookup tables to generate map for')
+    
     .alias('s', 'schema')
     .nargs('s', 1)
     .describe('s', 'schema name')
+    
     .alias('C', 'camelCase')
-    .describe('C', 'Camel-case columns')
-    .describe('noHeader', 'Do not write header')
+    .choices('C', [true, 'columns', 'types'])
+    .describe('C', 'Camel-case columns and types')
+    
     .demand('o')
     .nargs('o', 1)
     .alias('o', 'output')
     .describe('o', 'output file name')
+    .describe('noHeader', 'Do not write header')
+    
     .help('h')
     .alias('h', 'help')
     .argv;
@@ -59,9 +72,17 @@ let argv: SchematsConfig = yargs
                 argv.table = [argv.table]
             }
         }
+        
+        if (!Array.isArray(argv.lookupTable)) {
+            if (!argv.lookupTable) {
+                argv.lookupTable = []
+            } else {
+                argv.lookupTable = [argv.lookupTable]
+            }
+        }
 
         let formattedOutput = await typescriptOfSchema(
-            argv.conn, argv.table, argv.schema, { camelCase: argv.camelCase, writeHeader: !argv.noHeader })
+            argv.conn, argv.table, argv.schema, { camelCase: argv.camelCase, writeHeader: !argv.noHeader, lookupTables: argv.lookupTable })
         fs.writeFileSync(argv.output, formattedOutput)
 
     } catch (e) {

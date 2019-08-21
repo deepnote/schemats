@@ -1,5 +1,6 @@
 import { spawnSync } from 'child_process'
 import * as assert from 'power-assert'
+import { fileSync as tempFile } from 'tmp'
 
 describe('schemats cli tool integration testing', () => {
     describe('schemats generate postgres', () => {
@@ -10,12 +11,12 @@ describe('schemats cli tool integration testing', () => {
         })
         it('should run without error', () => {
             let {status, stdout, stderr} = spawnSync('node', [
-                'bin/schemats', 'generate',
-                '-c', process.env.POSTGRES_URL,
-                '-o', '/tmp/schemats_cli_postgres.ts'
+                'dist/bin/schemats', 'generate',
+                '-c', process.env.POSTGRES_URL as string,
+                '-o', tempFile().name
             ], { encoding: 'utf-8' })
             console.log('opopopopop', stdout, stderr)
-            assert.equal(0, status)
+            assert.equal(status, 0)
         })
     })
     describe('schemats generate mysql', () => {
@@ -26,12 +27,12 @@ describe('schemats cli tool integration testing', () => {
         })
         it('should run without error', () => {
             let {status} = spawnSync('node', [
-                'bin/schemats', 'generate',
-                '-c', process.env.MYSQL_URL,
+                'dist/bin/schemats', 'generate',
+                '-c', process.env.MYSQL_URL as string,
                 '-s', 'test',
-                '-o', '/tmp/schemats_cli_postgres.ts'
+                '-o', tempFile().name
             ])
-            assert.equal(0, status)
+            assert.equal(status, 0)
         })
     })
 })

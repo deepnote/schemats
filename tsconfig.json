@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+		"module": "commonjs",
+		"outDir": "dist",
         "target": "es5",
         "lib": ["es2015"],
         "noImplicitAny": true,
@@ -11,7 +12,8 @@
     },
     "exclude": [
         "node_modules",
-        "dts",
+		"dts",
+		"dist",
         "test/actual",
         "test/expected",
         "test/fixture"

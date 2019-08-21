@@ -3,11 +3,11 @@
  * Created by xiamx on 2016-08-10.
  */
 
-import { generateEnumType, generateTableTypes, generateTableInterface } from './typescript'
+import { generateEnumType, generateTableTypes, generateTableInterface, generateLookupEnum } from './typescript'
 import { getDatabase, Database } from './schema'
 import Options, { OptionValues } from './options'
 import { processString, Options as ITFOptions } from 'typescript-formatter'
-const pkgVersion = require('../package.json').version
+const pkgVersion = require('../../package.json').version
 
 function getTime () {
     let padTime = (value: number) => `0${value}`.slice(-2)
@@ -21,7 +21,7 @@ function getTime () {
     return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`
 }
 
-function buildHeader (db: Database, tables: string[], schema: string|null, options: OptionValues): string {
+function buildHeader (db: Database, tables: string[], schema: string|null, options: Partial<OptionValues>): string {
     let commands = ['schemats', 'generate', '-c', db.connectionString.replace(/:\/\/.*@/,'://username:password@')]
     if (options.camelCase) commands.push('-C')
     if (tables.length > 0) {
@@ -45,7 +45,7 @@ function buildHeader (db: Database, tables: string[], schema: string|null, optio
     `
 }
 
-export async function typescriptOfTable (db: Database|string, 
+export async function typescriptOfTable (db: Database|string,
                                          table: string,
                                          schema: string,
                                          options = new Options()) {
@@ -57,13 +57,16 @@ export async function typescriptOfTable (db: Database|string,
     let tableTypes = await db.getTableTypes(table, schema, options)
     interfaces += generateTableTypes(table, tableTypes, options)
     interfaces += generateTableInterface(table, tableTypes, options)
+    if (options.options.lookupTables && options.options.lookupTables.indexOf(table) >= 0) {
+        interfaces += await generateLookupEnum(db, table, tableTypes, options)
+    }
     return interfaces
 }
 
 export async function typescriptOfSchema (db: Database|string,
                                           tables: string[] = [],
                                           schema: string|null = null,
-                                          options: OptionValues = {}): Promise<string> {
+                                          options: Partial<OptionValues> = {}): Promise<string> {
     if (typeof db === 'string') {
         db = getDatabase(db)
     }

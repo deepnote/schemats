@@ -2,6 +2,8 @@ import * as assert from 'power-assert'
 import { Database, getDatabase } from '../../src/index'
 import { writeTsFile, compare, loadSchema } from '../testUtility'
 
+require('dotenv').config()
+
 describe('schemat generation integration testing', () => {
     describe('postgres', () => {
         let db: Database
@@ -17,7 +19,7 @@ describe('schemat generation integration testing', () => {
             const inputSQLFile = 'test/fixture/postgres/osm.sql'
             const outputFile = './test/actual/postgres/osm.ts'
             const expectedFile = './test/expected/postgres/osm.ts'
-            const config: any = './fixture/postgres/osm.json'
+            const config: any = '../../test/fixture/postgres/osm.json'
             await writeTsFile(inputSQLFile, config, outputFile, db)
             return assert(await compare(expectedFile, outputFile))
         })
@@ -25,7 +27,23 @@ describe('schemat generation integration testing', () => {
             const inputSQLFile = 'test/fixture/postgres/osm.sql'
             const outputFile = './test/actual/postgres/osm-camelcase.ts'
             const expectedFile = './test/expected/postgres/osm-camelcase.ts'
-            const config: any = './fixture/postgres/osm-camelcase.json'
+            const config: any = '../../test/fixture/postgres/osm-camelcase.json'
+            await writeTsFile(inputSQLFile, config, outputFile, db)
+            return assert(await compare(expectedFile, outputFile))
+        })
+        it('Camelcase (types only) generation', async () => {
+            const inputSQLFile = 'test/fixture/postgres/osm.sql'
+            const outputFile = './test/actual/postgres/osm-camelcase-types.ts'
+            const expectedFile = './test/expected/postgres/osm-camelcase-types.ts'
+            const config: any = './fixture/postgres/osm-camelcase-types.json'
+            await writeTsFile(inputSQLFile, config, outputFile, db)
+            return assert(await compare(expectedFile, outputFile))
+        })
+        it('Camelcase (columns only) generation', async () => {
+            const inputSQLFile = 'test/fixture/postgres/osm.sql'
+            const outputFile = './test/actual/postgres/osm-camelcase-columns.ts'
+            const expectedFile = './test/expected/postgres/osm-camelcase-columns.ts'
+            const config: any = './fixture/postgres/osm-camelcase-columns.json'
             await writeTsFile(inputSQLFile, config, outputFile, db)
             return assert(await compare(expectedFile, outputFile))
         })
@@ -44,14 +62,14 @@ describe('schemat generation integration testing', () => {
             const inputSQLFile = 'test/fixture/mysql/osm.sql'
             const outputFile = './test/actual/mysql/osm.ts'
             const expectedFile = './test/expected/mysql/osm.ts'
-            const config: any = './fixture/mysql/osm.json'
+            const config: any = '../../test/fixture/mysql/osm.json'
             await writeTsFile(inputSQLFile, config, outputFile, db)
             return assert(await compare(expectedFile, outputFile))
         })
         it('Enum conflict in columns', async () => {
             const inputSQLFile = 'test/fixture/mysql/conflict.sql'
             const outputFile = './test/actual/mysql/conflict.ts'
-            const config: any = './fixture/mysql/conflict.json'
+            const config: any = '../../test/fixture/mysql/conflict.json'
             try {
                 await writeTsFile(inputSQLFile, config, outputFile, db)
             } catch (e) {
