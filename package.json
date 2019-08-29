@@ -1,6 +1,6 @@
 {
   "name": "@holdyourwaffle/schemats",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Generate typescript interface definitions from (postgres) SQL database schema",
   "keywords": [
     "postgres",
@@ -34,8 +34,8 @@
   "contributors": [
     "Arnaud Benhamdine <arnaud.benhamdine@gmail.com>",
     "zigomir <zigomir@gmail.com>",
-	"Mark Crisp <macr1324@gmail.com>",
-	"HoldYourWaffle <supershitcodemonkey@gmail.com>"
+    "Mark Crisp <macr1324@gmail.com>",
+    "HoldYourWaffle <supershitcodemonkey@gmail.com>"
   ],
   "license": "MIT",
   "devDependencies": {
